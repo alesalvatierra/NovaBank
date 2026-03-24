@@ -50,7 +50,6 @@ public class Main {
     }
 
     //Submenús
-
     private static void menuClientes(Scanner sc, ClienteService service) {
         int opcion = -1;
         do {
