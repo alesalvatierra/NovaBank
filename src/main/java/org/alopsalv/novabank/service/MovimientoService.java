@@ -5,6 +5,10 @@ import org.alopsalv.novabank.model.Movimiento;
 import org.alopsalv.novabank.repository.MovimientoRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovimientoService {
 
@@ -33,7 +37,27 @@ public class MovimientoService {
     }
 
     // Método para obtener todos los movimientos de una cuenta concreta
-    public java.util.List<Movimiento> obtenerMovimientosDeCuenta(Long cuentaId) {
+    public List<Movimiento> obtenerMovimientosDeCuenta(Long cuentaId) {
         return movimientoRepository.buscarPorCuentaId(cuentaId);
+    }
+
+    // Método para filtrar movimientos por cuenta e intervalo de fechas
+    public List<Movimiento> obtenerMovimientosPorFecha(Long cuentaId, LocalDate inicio, LocalDate fin) {
+        //Obtenemos todos los movimientos
+        List<Movimiento> todos = movimientoRepository.buscarPorCuentaId(cuentaId);
+        List<Movimiento> filtrados = new ArrayList<>();
+
+        //Convertimos las fechas de inicio y fin
+        LocalDateTime fechaInicio = inicio.atStartOfDay();
+        LocalDateTime fechaFin = fin.atTime(23, 59, 59);
+
+        //Filtramos
+        for (Movimiento m : todos) {
+            if ((m.getFecha().isEqual(fechaInicio) || m.getFecha().isAfter(fechaInicio)) &&
+                    (m.getFecha().isEqual(fechaFin) || m.getFecha().isBefore(fechaFin))) {
+                filtrados.add(m);
+            }
+        }
+        return filtrados;
     }
 }
