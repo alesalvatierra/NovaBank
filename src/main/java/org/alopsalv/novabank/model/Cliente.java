@@ -9,7 +9,13 @@ public class Cliente {
     private LocalDateTime fechaCreacion;
 
     //Constructor
-    public Cliente() {
+
+    public Cliente(String nombre, String apellidos, String dni, String email, String telefono) {
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.dni = dni;
+        this.email = email;
+        this.telefono = telefono;
     }
 
     //Getters y Setters

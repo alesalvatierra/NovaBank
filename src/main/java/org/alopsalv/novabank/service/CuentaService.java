@@ -19,7 +19,7 @@ public class CuentaService {
 
         var clienteExistente = clienteService.buscarCliente(cuentaNueva.getClienteId());
         if (clienteExistente == null){
-            throw new IllegalArgumentException("Error: El cliente no existe");
+            throw new IllegalArgumentException("ERROR: No se encontró ningún cliente con dni");
         }
 
         return cuentaRepository.guardarCuenta(cuentaNueva);
@@ -33,4 +33,6 @@ public class CuentaService {
     public List<Cuenta> obtenerCuentasDeCliente(Long clienteId){
         return cuentaRepository.buscarPorClienteId(clienteId);
     }
+
+
 }

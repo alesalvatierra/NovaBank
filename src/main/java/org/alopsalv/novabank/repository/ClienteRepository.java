@@ -32,7 +32,7 @@ public class ClienteRepository {
     public Cliente buscarPorDni(String dni){
         //Recorremos y comprobamos si coincide el dni.
         for (Cliente cliente : clientes.values()){
-            if (cliente.getDni().equals(dni)){
+            if (cliente.getDni().equalsIgnoreCase(dni)){
                 return cliente;
             }
         }
