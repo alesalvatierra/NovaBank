@@ -295,7 +295,7 @@ public class Main {
                                 if (cuentaDeposito == null){
                                     System.err.println("ERROR: No se ha encontrado la cuenta con el IBAN: " + numCuentaDeposito);
                                 } else {
-                                    System.out.println("Introduzca la cantidad a depositar: ");
+                                    System.out.print("Introduzca la cantidad a depositar: ");
                                     BigDecimal cantidadDeposito;
 
                                     try{
@@ -372,13 +372,79 @@ public class Main {
                                         //Imprimimos resultados
                                         System.out.println("Retirada realizada correctamente.");
                                         System.out.println("Cuenta: " + cuentaRetirada.getNumeroCuenta());
-                                        System.out.printf("Importe: +%,.2f €%n", cantidadRetirada);
+                                        System.out.printf("Importe: -%,.2f €%n", cantidadRetirada); // Corregido el símbolo a negativo
                                         System.out.printf("Nuevo saldo: %,.2f €%n", cuentaRetirada.getSaldo());
                                     }
                                 }
                                 break;
-                        }
+                            case 3:
+                                System.out.println("--- TRANSFERENCIAS ENTRE CUENTAS ---");
+                                //Solicitamos el IBAN de origen
+                                System.out.print("Introduzca el número de cuenta de ORIGEN (IBAN): ");
+                                String numCuentaOrigen = scanner.nextLine();
+                                Cuenta cuentaOrigen = cuentaService.buscarCuenta(numCuentaOrigen);
+                                //Validamos que la cuenta Origen no sea null
+                                if (cuentaOrigen == null) {
+                                    System.err.println("ERROR: No se encontró la cuenta de origen.");
+                                    break;
+                                }
+                                System.out.print("Introduzca el número de cuenta de DESTINO (IBAN): ");
+                                String numCuentaDestino = scanner.nextLine();
+                                Cuenta cuentaDestino = cuentaService.buscarCuenta(numCuentaDestino);
+                                //Validamos que la cuenta Destino no sea null
+                                if (cuentaDestino == null) {
+                                    System.err.println("ERROR: No se encontró la cuenta de destino.");
+                                    break;
+                                }
+                                //Validamos que no sean la misma cuenta
+                                if (cuentaOrigen.getId().equals(cuentaDestino.getId())) {
+                                    System.err.println("ERROR: No se puede realizar una transferencia a la misma cuenta.");
+                                    break;
+                                }
+                                //Solicitamos el importe a transferir
+                                System.out.print("Introduzca la cantidad a transferir: ");
+                                BigDecimal cantidadTransferencia;
 
+                                try {
+                                    cantidadTransferencia = new BigDecimal(scanner.nextLine());
+                                }catch (NumberFormatException e){
+                                    System.err.println("ERROR: La cantidad debe ser un valor numérico válido.");
+                                    break;
+                                }
+
+                                if (cantidadTransferencia.compareTo(BigDecimal.ZERO) <= 0){
+                                    System.err.println("ERROR: La cantidad debe ser mayor que 0.");
+                                }else if (cuentaOrigen.getSaldo().compareTo(cantidadTransferencia) < 0) {
+                                    System.err.println("ERROR: Saldo insuficiente en la cuenta de origen. Saldo actual: " + cuentaOrigen.getSaldo() + " €");
+                                } else {
+                                    try {
+                                        //Retiramos el importe de la cuenta origen y registramos como TRANSFERENCIA_SALIENTE
+                                        Movimiento salida = new Movimiento();
+                                        salida.setCuentaId(cuentaOrigen.getId());
+                                        salida.setTipo("TRANSFERENCIA_SALIENTE");
+                                        salida.setCantidad(cantidadTransferencia);
+                                        salida.setFecha(LocalDateTime.now());
+                                        movimientoService.registrarMovimiento(salida, cuentaOrigen);
+
+                                        //Depositamos el importe de la cuenta de destino y registramos como TRANSFERENCIA_ENTRANTE
+                                        Movimiento entrada = new Movimiento();
+                                        entrada.setCuentaId(cuentaDestino.getId());
+                                        entrada.setTipo("TRANSFERENCIA_ENTRANTE");
+                                        entrada.setCantidad(cantidadTransferencia);
+                                        entrada.setFecha(LocalDateTime.now());
+                                        movimientoService.registrarMovimiento(entrada, cuentaDestino);
+
+                                        //Imprimimos el ticket
+                                        System.out.println("Transferencia realizada correctamente.");
+                                        System.out.printf("Cuenta origen: %s → -%,.2f €%n", cuentaOrigen.getNumeroCuenta(), cantidadTransferencia);
+                                        System.out.printf("Cuenta destino: %s → +%,.2f €%n", cuentaDestino.getNumeroCuenta(), cantidadTransferencia);
+
+                                    } catch (Exception e) {
+                                        System.err.println("ERROR crítico durante la transferencia: " + e.getMessage());
+                                    }
+                                }
+                                break;
+                        }
                     } while (opcionOperaciones !=4);
                     break;
 
@@ -392,6 +458,35 @@ public class Main {
                         System.out.println("4. Volver");
                         opcionConsultas = scanner.nextInt();
                         scanner.nextLine();
+
+                        switch (opcionConsultas){
+                            case 1:
+                                System.out.println("--- CONSULTAR SALDO ---");
+                                System.out.print("Introduzca el número de cuenta (IBAN): ");
+                                String numCuentaSaldo = scanner.nextLine();
+
+                                //Buscamos la cuenta usando el servicio
+                                Cuenta cuentaSaldo = cuentaService.buscarCuenta(numCuentaSaldo);
+
+                                if (cuentaSaldo == null) {
+                                    System.err.println("ERROR: No se encontró ninguna cuenta con el número " + numCuentaSaldo);
+                                } else {
+                                    //Imprimimos el saldo
+                                    System.out.println("Consulta de saldo exitosa.");
+                                    System.out.println("Cuenta: " + cuentaSaldo.getNumeroCuenta());
+                                    System.out.printf("Saldo disponible: %,.2f €%n", cuentaSaldo.getSaldo());
+                                }
+                                break;
+
+                            case 2:
+
+                                break;
+
+                            case 3:
+
+                                break;
+                        }
+
                     } while (opcionConsultas !=4);
                     break;
 

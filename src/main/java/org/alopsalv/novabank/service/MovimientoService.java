@@ -19,13 +19,13 @@ public class MovimientoService {
     public Movimiento registrarMovimiento(Movimiento movimiento, Cuenta cuenta) {
 
         //En caso de DEPOSITO, sumamos
-        if (movimiento.getTipo().equals("DEPOSITO")) {
+        if (movimiento.getTipo().equals("DEPOSITO") || movimiento.getTipo().equals("TRANSFERENCIA_ENTRANTE")) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getCantidad());
             cuenta.setSaldo(nuevoSaldo);
         }
 
         //En caso de RETIRADA, restamos
-        if (movimiento.getTipo().equals("RETIRADA")) {
+        if (movimiento.getTipo().equals("RETIRADA") || movimiento.getTipo().equals("TRANSFERENCIA_SALIENTE")) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(movimiento.getCantidad());
             cuenta.setSaldo(nuevoSaldo);
         }
