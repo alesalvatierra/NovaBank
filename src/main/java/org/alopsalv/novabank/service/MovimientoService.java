@@ -29,10 +29,20 @@ public class MovimientoService {
         }
 
         //En caso de RETIRADA, restamos
-        if (movimiento.getTipo().equals("RETIRADA") || movimiento.getTipo().equals("TRANSFERENCIA_SALIENTE")) {
+        if (movimiento.getTipo().equals("RETIRO") || movimiento.getTipo().equals("TRANSFERENCIA_SALIENTE")) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(movimiento.getCantidad());
+            //Validación para que la cantidad sea mayor de 0
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
+                throw new IllegalArgumentException("Operación denegada: Saldo insuficiente.");
+            }
             cuenta.setSaldo(nuevoSaldo);
         }
+
+        //Validación para que la cantidad sea mayor de 0
+        if (movimiento.getCantidad().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("La cantidad del movimiento debe ser mayor que cero.");
+        }
+
         movimientoRepository.guardarMovimiento(movimiento);
     }
 
