@@ -2,6 +2,7 @@ package org.alopsalv.novabank;
 
 import org.alopsalv.novabank.model.Cliente;
 import org.alopsalv.novabank.model.Cuenta;
+import org.alopsalv.novabank.model.Movimiento;
 import org.alopsalv.novabank.repository.ClienteRepository;
 import org.alopsalv.novabank.repository.CuentaRepository;
 import org.alopsalv.novabank.repository.MovimientoRepository;
@@ -9,6 +10,8 @@ import org.alopsalv.novabank.service.ClienteService;
 import org.alopsalv.novabank.service.CuentaService;
 import org.alopsalv.novabank.service.MovimientoService;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -279,6 +282,59 @@ public class Main {
                         System.out.println("4. Volver");
                         opcionOperaciones = scanner.nextInt();
                         scanner.nextLine();
+
+                        switch (opcionOperaciones){
+                            case 1:
+                                System.out.println("--- DEPOSITAR DINERO ---");
+                                System.out.print("Introduzca el número de cuenta (IBAN): ");
+                                String numCuentaDeposito = scanner.nextLine();
+
+                                //Validamos que exista la cuenta
+                                Cuenta cuentaDeposito = cuentaService.buscarCuenta(numCuentaDeposito);
+
+                                if (cuentaDeposito == null){
+                                    System.err.println("ERROR: No se ha encontrado la cuenta con el IBAN: " + numCuentaDeposito);
+                                } else {
+                                    System.out.println("Introduzca la cantidad a depositar: ");
+                                    BigDecimal cantidadDeposito;
+
+                                    try{
+                                        //Convertimos entrada a BigDecimal
+                                        cantidadDeposito = new BigDecimal(scanner.nextLine());
+                                    } catch (NumberFormatException e){
+                                        System.err.println("ERROR: La cantidad debe ser un valor numérico");
+                                        break;
+                                    }
+
+                                    if (cantidadDeposito.compareTo(BigDecimal.ZERO) <= 0){
+                                        System.err.println("ERROR: La cantidad a depositar debe ser mayor que 0");
+                                    }else {
+                                        Movimiento deposito = new Movimiento();
+                                        //Obtenemos el ID
+                                        deposito.setCuentaId(cuentaDeposito.getId());
+                                        //Seleccionamos tipo "DEPOSITO"
+                                        deposito.setTipo("DEPOSITO");
+                                        //Llamamos a la cantidad seleccionada
+                                        deposito.setCantidad(cantidadDeposito);
+                                        //Guardamos la fecha actual
+                                        deposito.setFecha(LocalDateTime.now());
+
+                                        //Llamamos al servicio para que registre el movimiento
+                                        movimientoService.registrarMovimiento(deposito,cuentaDeposito);
+                                        //Imprimimos resultados
+                                        System.out.println("Depósito realizado correctamente.");
+                                        System.out.println("Cuenta: " + cuentaDeposito.getNumeroCuenta());
+                                        System.out.printf("Importe: +%,.2f €%n", cantidadDeposito);
+                                        System.out.printf("Nuevo saldo: %,.2f €%n", cuentaDeposito.getSaldo());
+                                    }
+                                }
+                                break;
+
+                            case 2:
+
+                                break;
+                        }
+
                     } while (opcionOperaciones !=4);
                     break;
 

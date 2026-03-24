@@ -18,8 +18,8 @@ public class MovimientoService {
     //Método para registrar un movimiento
     public Movimiento registrarMovimiento(Movimiento movimiento, Cuenta cuenta) {
 
-        //En caso de INGRESO, sumamos
-        if (movimiento.getTipo().equals("INGRESO")) {
+        //En caso de DEPOSITO, sumamos
+        if (movimiento.getTipo().equals("DEPOSITO")) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getCantidad());
             cuenta.setSaldo(nuevoSaldo);
         }
