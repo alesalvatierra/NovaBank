@@ -3,6 +3,7 @@ package org.alopsalv.novabank.service;
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.repository.CuentaRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CuentaService {
@@ -16,6 +17,10 @@ public class CuentaService {
     }
     //Método para crear una cuenta validando que esta existe.
     public Cuenta crearCuenta(Cuenta cuentaNueva){
+
+        if (cuentaNueva.getSaldo().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo.");
+        }
 
         var clienteExistente = clienteService.buscarCliente(cuentaNueva.getClienteId());
         if (clienteExistente == null){

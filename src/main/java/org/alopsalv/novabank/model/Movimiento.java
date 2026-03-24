@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class Movimiento {
 
     private Long id, cuentaId;
-    private String tipo;
+    private TipoMovimiento tipo;
     private BigDecimal cantidad;
     private LocalDateTime fecha;
 
@@ -31,11 +31,11 @@ public class Movimiento {
         this.cuentaId = cuentaId;
     }
 
-    public String getTipo() {
+    public TipoMovimiento getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoMovimiento tipo) {
         this.tipo = tipo;
     }
 

@@ -2,6 +2,7 @@ package org.alopsalv.novabank.service;
 
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.model.Movimiento;
+import org.alopsalv.novabank.model.TipoMovimiento;
 import org.alopsalv.novabank.repository.MovimientoRepository;
 
 import java.math.BigDecimal;
@@ -23,13 +24,13 @@ public class MovimientoService {
     public void registrarMovimiento(Movimiento movimiento, Cuenta cuenta) {
 
         //En caso de DEPOSITO, sumamos
-        if (movimiento.getTipo().equals("DEPOSITO") || movimiento.getTipo().equals("TRANSFERENCIA_ENTRANTE")) {
+        if (movimiento.getTipo() == TipoMovimiento.RETIRO || movimiento.getTipo() == TipoMovimiento.TRANSFERENCIA_ENTRANTE) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().add(movimiento.getCantidad());
             cuenta.setSaldo(nuevoSaldo);
         }
 
         //En caso de RETIRADA, restamos
-        if (movimiento.getTipo().equals("RETIRO") || movimiento.getTipo().equals("TRANSFERENCIA_SALIENTE")) {
+        if (movimiento.getTipo() == TipoMovimiento.DEPOSITO|| movimiento.getTipo() == TipoMovimiento.TRANSFERENCIA_SALIENTE) {
             BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(movimiento.getCantidad());
             //Validación para que la cantidad sea mayor de 0
             if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {

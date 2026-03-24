@@ -203,7 +203,10 @@ public class Main {
         System.out.print("Introduzca la cantidad a depositar: ");
         BigDecimal cant = leerBigDecimal(sc);
         if (cant.compareTo(BigDecimal.ZERO) <= 0) { System.err.println("ERROR: Cantidad debe ser mayor que 0"); return; }
-        moS.registrarMovimiento(crearM(c.getId(), "DEPOSITO", cant), c);
+
+
+        moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.DEPOSITO, cant), c);
+
         System.out.println("Depósito realizado correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: +%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());
     }
@@ -218,7 +221,10 @@ public class Main {
         if (cant.compareTo(BigDecimal.ZERO) <= 0 || c.getSaldo().compareTo(cant) < 0) {
             System.err.println("ERROR: Saldo insuficiente o cantidad inválida."); return;
         }
-        moS.registrarMovimiento(crearM(c.getId(), "RETIRADA", cant), c);
+
+
+        moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.RETIRO, cant), c);
+
         System.out.println("Retirada realizada correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: -%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());
     }
@@ -235,8 +241,10 @@ public class Main {
         if (cant.compareTo(BigDecimal.ZERO) <= 0 || ori.getSaldo().compareTo(cant) < 0) {
             System.err.println("ERROR: Saldo insuficiente."); return;
         }
-        moS.registrarMovimiento(crearM(ori.getId(), "TRANSFERENCIA_SALIENTE", cant), ori);
-        moS.registrarMovimiento(crearM(des.getId(), "TRANSFERENCIA_ENTRANTE", cant), des);
+
+        moS.registrarMovimiento(crearM(ori.getId(), TipoMovimiento.TRANSFERENCIA_SALIENTE, cant), ori);
+        moS.registrarMovimiento(crearM(des.getId(), TipoMovimiento.TRANSFERENCIA_ENTRANTE, cant), des);
+
         System.out.println("Transferencia realizada correctamente.");
         System.out.printf("Cuenta origen: %s → -%,.2f €%nCuenta destino: %s → +%,.2f €%n", ori.getNumeroCuenta(), cant, des.getNumeroCuenta(), cant);
     }
@@ -262,7 +270,7 @@ public class Main {
             System.out.printf("%-5s | %-20s | %-25s | %-15s%n", "ID", "Fecha", "Tipo", "Importe");
             System.out.println("------|----------------------|---------------------------|----------------");
             for (Movimiento m : ms) {
-                String s = (m.getTipo().equals("DEPOSITO") || m.getTipo().equals("TRANSFERENCIA_ENTRANTE")) ? "+" : "-";
+                String s = (m.getTipo() == TipoMovimiento.DEPOSITO || m.getTipo() == TipoMovimiento.TRANSFERENCIA_ENTRANTE) ? "+" : "-";
                 System.out.printf("%-5d | %-20s | %-25s | %s%,.2f €%n", m.getId(), m.getFecha().format(FMT), m.getTipo(), s, m.getCantidad());
             }
         }
@@ -283,7 +291,7 @@ public class Main {
                 System.out.printf("%-5s | %-20s | %-25s | %-15s%n", "ID", "Fecha", "Tipo", "Importe");
                 System.out.println("------|----------------------|---------------------------|----------------");
                 for (Movimiento m : f) {
-                    String s = (m.getTipo().contains("DEPOSITO") || m.getTipo().contains("ENTRANTE")) ? "+" : "-";
+                    String s = (m.getTipo() == TipoMovimiento.DEPOSITO || m.getTipo() == TipoMovimiento.TRANSFERENCIA_ENTRANTE) ? "+" : "-";
                     System.out.printf("%-5d | %-20s | %-25s | %s%,.2f €%n", m.getId(), m.getFecha().format(FMT), m.getTipo(), s, m.getCantidad());
                 }
             }
@@ -297,7 +305,7 @@ public class Main {
     //Controla los BigDecimal
     private static BigDecimal leerBigDecimal(Scanner sc) { try { return new BigDecimal(sc.nextLine()); } catch (Exception ex) { return BigDecimal.ZERO; } }
     //Método factoría para crear el Movimiento
-    private static Movimiento crearM(Long id, String t, BigDecimal c) {
+    private static Movimiento crearM(Long id, TipoMovimiento t, BigDecimal c) {
         Movimiento m = new Movimiento(); m.setCuentaId(id); m.setTipo(t); m.setCantidad(c); m.setFecha(LocalDateTime.now()); return m;
     }
 }

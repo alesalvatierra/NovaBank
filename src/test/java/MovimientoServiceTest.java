@@ -1,5 +1,6 @@
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.model.Movimiento;
+import org.alopsalv.novabank.model.TipoMovimiento;
 import org.alopsalv.novabank.repository.MovimientoRepository;
 import org.alopsalv.novabank.service.MovimientoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class MovimientoServiceTest {
     void registrarDepositoBien() {
         Movimiento deposito = new Movimiento();
         deposito.setCuentaId(1L);
-        deposito.setTipo("DEPOSITO");
+        deposito.setTipo(TipoMovimiento.DEPOSITO);
         deposito.setCantidad(new BigDecimal("500.00"));
         deposito.setFecha(LocalDateTime.now());
 
@@ -49,7 +50,7 @@ class MovimientoServiceTest {
     void registrarRetiroBien() {
         Movimiento retiro = new Movimiento();
         retiro.setCuentaId(1L);
-        retiro.setTipo("RETIRO");
+        retiro.setTipo(TipoMovimiento.RETIRO);
         retiro.setCantidad(new BigDecimal("200.00"));
         retiro.setFecha(LocalDateTime.now());
 
@@ -64,7 +65,7 @@ class MovimientoServiceTest {
     void registrarMovimientoCantidadInvalida() {
         Movimiento movimientoMalo = new Movimiento();
         movimientoMalo.setCuentaId(1L);
-        movimientoMalo.setTipo("DEPOSITO");
+        movimientoMalo.setTipo(TipoMovimiento.DEPOSITO);
         //Introducimos una cantidad negativa
         movimientoMalo.setCantidad(new BigDecimal("-50.00"));
 
@@ -80,7 +81,7 @@ class MovimientoServiceTest {
     void registrarRetiroSaldoInsuficiente() {
         Movimiento retiroMasivo = new Movimiento();
         retiroMasivo.setCuentaId(1L);
-        retiroMasivo.setTipo("RETIRO");
+        retiroMasivo.setTipo(TipoMovimiento.RETIRO);
         //Intentamos sacar 5000€ de una cuenta que solo tiene 1000€
         retiroMasivo.setCantidad(new BigDecimal("5000.00"));
 
