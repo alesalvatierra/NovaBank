@@ -331,7 +331,51 @@ public class Main {
                                 break;
 
                             case 2:
+                                System.out.println("--- RETIRAR DINERO ---");
+                                System.out.print("Introduzca el número de cuenta (IBAN): ");
+                                String numCuentaRetirada = scanner.nextLine();
 
+                                //Validamos que exista la cuenta
+                                Cuenta cuentaRetirada = cuentaService.buscarCuenta(numCuentaRetirada);
+
+                                if (cuentaRetirada == null){
+                                    System.err.println("ERROR: No se ha encontrado la cuenta con el IBAN: " + numCuentaRetirada);
+                                } else {
+                                    System.out.print("Introduzca la cantidad a retirar: ");
+                                    BigDecimal cantidadRetirada;
+
+                                    try{
+                                        //Convertimos entrada a BigDecimal
+                                        cantidadRetirada = new BigDecimal(scanner.nextLine());
+                                    } catch (NumberFormatException e){
+                                        System.err.println("ERROR: La cantidad debe ser un valor numérico");
+                                        break;
+                                    }
+
+                                    if (cantidadRetirada.compareTo(BigDecimal.ZERO) <= 0) {
+                                        System.err.println("ERROR: La cantidad a retirar debe ser mayor que 0");
+                                    } else if(cuentaRetirada.getSaldo().compareTo(cantidadRetirada) < 0) {
+                                        System.err.println("ERROR: Saldo insuficiente. Su saldo actual es de " +cuentaRetirada.getSaldo() + "€");
+                                    }else {
+                                        Movimiento retirada = new Movimiento();
+                                        //Obtenemos el ID
+                                        retirada.setCuentaId(cuentaRetirada.getId());
+                                        //Seleccionamos tipo "RETIRADA"
+                                        retirada.setTipo("RETIRADA");
+                                        //Llamamos a la cantidad seleccionada
+                                        retirada.setCantidad(cantidadRetirada);
+                                        //Guardamos la fecha actual
+                                        retirada.setFecha(LocalDateTime.now());
+
+                                        //Llamamos al servicio para que registre el movimiento
+                                        movimientoService.registrarMovimiento(retirada,cuentaRetirada);
+                                        //Imprimimos resultados
+                                        System.out.println("Retirada realizada correctamente.");
+                                        System.out.println("Cuenta: " + cuentaRetirada.getNumeroCuenta());
+                                        System.out.printf("Importe: +%,.2f €%n", cantidadRetirada);
+                                        System.out.printf("Nuevo saldo: %,.2f €%n", cuentaRetirada.getSaldo());
+                                    }
+                                }
                                 break;
                         }
 
