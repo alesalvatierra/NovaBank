@@ -238,6 +238,32 @@ public class Main {
                                     }
                                 }
                                 break;
+                            case 3:
+                                System.out.println("--- INFORMACIÓN DE CUENTA ---");
+                                System.out.print("Introduzca número de cuenta: ");
+                                String numeroCuentaBuscada = scanner.nextLine();
+
+                                //Buscamos la cuenta por el IBAN a través del servicio
+                                Cuenta cuentaEncontrada = cuentaService.buscarCuenta(numeroCuentaBuscada);
+
+                                if (cuentaEncontrada == null){
+                                    System.err.println("ERROR: No se encontró ninguna cuenta con el número " + numeroCuentaBuscada);
+                                } else {
+                                    //Buscamos el titular usando el ID.
+                                    Cliente titularCuenta = clienteService.buscarCliente(cuentaEncontrada.getClienteId());
+                                    //Formateamos la fecha
+                                    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                    String fechaFormateada = cuentaEncontrada.getFechaCreacion().format(formatter);
+
+                                    System.out.println("Número de cuenta: " + cuentaEncontrada.getNumeroCuenta());
+                                    if (titularCuenta!= null){
+                                        System.out.println("Titular: " + titularCuenta.getNombre() + " " + titularCuenta.getApellidos());
+                                    } else {
+                                        System.out.println("Titular: Cliente Desconocido");
+                                    }
+                                }
+
+                                break;
                         }
 
                     } while (opcionCuenta !=4);
@@ -268,6 +294,7 @@ public class Main {
                         scanner.nextLine();
                     } while (opcionConsultas !=4);
                     break;
+
             }
 
         }while (opcionPrincipal !=5);
