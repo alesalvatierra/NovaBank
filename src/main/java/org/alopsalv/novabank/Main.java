@@ -12,6 +12,7 @@ import org.alopsalv.novabank.service.MovimientoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -479,7 +480,41 @@ public class Main {
                                 break;
 
                             case 2:
+                                System.out.println("---HISTORIAL DE MOVIMIENTOS---");
+                                System.out.println("Introduzca el número de cuenta (IBAN): ");
+                                String numCuentaHistorial = scanner.nextLine();
 
+                                Cuenta cuentaHistorial = cuentaService.buscarCuenta(numCuentaHistorial);
+
+                                if (cuentaHistorial == null){
+                                    System.err.println("ERROR: No se encontró ninguna cuenta con el número " + numCuentaHistorial);
+                                } else {
+                                    List<Movimiento> listaMovimientos = movimientoService.obtenerMovimientosDeCuenta(cuentaHistorial.getId());
+
+                                    if (listaMovimientos.isEmpty()){
+                                        System.out.println("Esta cuenta aún no tiene ningún movimiento registrado.");
+                                    } else {
+                                        //Imprimimos la cabecera de la tabla
+                                        System.out.println("Historial de la cuenta: " + cuentaHistorial.getNumeroCuenta());
+                                        System.out.printf("%-5s | %-20s | %-25s | %-15s%n", "ID", "Fecha", "Tipo", "Importe");
+                                        System.out.println("------|----------------------|---------------------------|----------------");
+
+                                        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                                        for (Movimiento m : listaMovimientos){
+                                            String fechaLimpia = m.getFecha().format(fmt);
+
+                                            //Calculamos si es Ingreso o Gasto
+                                            String signo = (m.getTipo().equals("DEPOSITO") || m.getTipo().equals("TRANSFERENCIA_ENTRANTE")) ? "+" : "-";
+                                            System.out.printf("%-5d | %-20s | %-25s | %s%,.2f €%n",
+                                                    m.getId(),
+                                                    fechaLimpia,
+                                                    m.getTipo(),
+                                                    signo,
+                                                    m.getCantidad());
+                                        }
+                                    }
+                                }
                                 break;
 
                             case 3:

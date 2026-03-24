@@ -16,7 +16,7 @@ public class MovimientoService {
     }
 
     //Método para registrar un movimiento
-    public Movimiento registrarMovimiento(Movimiento movimiento, Cuenta cuenta) {
+    public void registrarMovimiento(Movimiento movimiento, Cuenta cuenta) {
 
         //En caso de DEPOSITO, sumamos
         if (movimiento.getTipo().equals("DEPOSITO") || movimiento.getTipo().equals("TRANSFERENCIA_ENTRANTE")) {
@@ -29,6 +29,11 @@ public class MovimientoService {
             BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(movimiento.getCantidad());
             cuenta.setSaldo(nuevoSaldo);
         }
-        return movimientoRepository.guardarMovimiento(movimiento);
+        movimientoRepository.guardarMovimiento(movimiento);
+    }
+
+    // Método para obtener todos los movimientos de una cuenta concreta
+    public java.util.List<Movimiento> obtenerMovimientosDeCuenta(Long cuentaId) {
+        return movimientoRepository.buscarPorCuentaId(cuentaId);
     }
 }
