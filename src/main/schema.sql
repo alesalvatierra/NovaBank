@@ -4,7 +4,7 @@ CREATE TABLE clientes (
      apellidos VARCHAR(150) NOT NULL,
      dni VARCHAR(20) UNIQUE NOT NULL,
      email VARCHAR(150) UNIQUE NOT NULL,
-     telefono VARCHAR(20) UNIQUE NOT NULL,
+     telefono VARCHAR(20) UNIQUE NOT NULL,mvn
      fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
