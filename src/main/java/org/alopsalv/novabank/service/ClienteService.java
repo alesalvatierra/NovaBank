@@ -53,15 +53,15 @@ public class ClienteService {
 
         return clienteRepository.guardarCliente(c);
     }
-
+    //Buscar Cliente
     public Cliente buscarCliente(Long id) {
         return clienteRepository.buscarPorId(id);
     }
-
+    //Buscar Cliente por DNI
     public Cliente buscarClientePorDni(String dni) {
         return clienteRepository.buscarPorDni(dni);
     }
-
+    //Obtener todos los Clientes
     public List<Cliente> obtenerTodosLosClientes() {
         return clienteRepository.obtenerTodos();
     }

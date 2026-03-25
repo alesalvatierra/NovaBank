@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Cuenta {
-
+    //Atributos
     private Long id, clienteId;
     private String numeroCuenta;
     private BigDecimal saldo;

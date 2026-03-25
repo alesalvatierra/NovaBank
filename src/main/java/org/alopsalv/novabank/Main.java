@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    //Formato para la fecha
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) {
@@ -106,7 +107,7 @@ public class Main {
         } while (opcion != 4);
     }
 
-    //Lógica de ejecución
+    //Crear Cliente
     private static void crearCliente(Scanner sc, ClienteService service) {
         System.out.println("--- CREACIÓN DE CLIENTE ---");
         System.out.print("Introduzca el nombre: "); String n = sc.nextLine();
@@ -120,7 +121,7 @@ public class Main {
             System.out.println("ID cliente: " + nuevo.getId());
         } catch (IllegalArgumentException ex) { System.err.println("ERROR: " + ex.getMessage()); }
     }
-
+    //Buscar Cliente
     private static void buscarCliente(Scanner sc, ClienteService service) {
         System.out.println("--- BUSCAR CLIENTE ---");
         System.out.println("1. Por ID interno\n2. Por DNI");
@@ -139,7 +140,7 @@ public class Main {
             System.out.println("ID: " + c.getId() + "\nNombre: " + c.getNombre() + "\nDNI: " + c.getDni() + "\nEmail: " + c.getEmail() + "\nTeléfono: " + c.getTelefono());
         } else if (modo == 1 || modo == 2) { System.out.println("No se encontró ningún cliente con esos datos."); }
     }
-
+    //Listar Clientes
     private static void listarClientes(ClienteService service) {
         System.out.println("--- LISTADO DE CLIENTES ---");
         List<Cliente> lista = service.obtenerTodosLosClientes();
@@ -150,7 +151,7 @@ public class Main {
             System.out.printf("%-5d | %-35s | %-10s | %-35s | %-10s%n", c.getId(), c.getNombre() + " " + c.getApellidos(), c.getDni(), c.getEmail(), c.getTelefono());
         }
     }
-
+    //Crear Cuenta
     private static void crearCuenta(Scanner sc, ClienteService clS, CuentaService cuS) {
         System.out.println("--- CREAR CUENTA ---");
         System.out.print("Introduzca el ID del cliente titular: ");
@@ -167,7 +168,7 @@ public class Main {
             System.out.println("Titular: " + t.getNombre() + " " + t.getApellidos() + " (ID: " + t.getId() + ")\nSaldo inicial: 0,00 €");
         } catch (Exception ex) { System.err.println("ERROR: " + ex.getMessage()); }
     }
-
+    //Listar todas las cuentas de 1 cliente
     private static void listarCuentasCliente(Scanner sc, ClienteService clS, CuentaService cuS) {
         System.out.println("--- LISTAR CUENTAS DEL CLIENTE ---");
         System.out.print("Introduzca ID del cliente: ");
@@ -183,7 +184,7 @@ public class Main {
             for (Cuenta c : cuentas) { System.out.printf("%-25s | %s €%n", c.getNumeroCuenta(), c.getSaldo()); }
         }
     }
-
+    //Ver información de 1 cuenta
     private static void verInfoCuenta(Scanner sc, ClienteService clS, CuentaService cuS) {
         System.out.println("--- INFORMACIÓN DE CUENTA ---");
         System.out.print("Introduzca número de cuenta: ");
@@ -194,7 +195,7 @@ public class Main {
         System.out.println("Titular: " + (t != null ? t.getNombre() + " " + t.getApellidos() : "Desconocido"));
         System.out.println("Saldo: " + c.getSaldo() + " €\nFecha de creación: " + c.getFechaCreacion().format(FMT));
     }
-
+    //Depositar dinero
     private static void depositar(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("--- DEPOSITAR DINERO ---");
         System.out.print("Introduzca el número de cuenta (IBAN): ");
@@ -204,13 +205,12 @@ public class Main {
         BigDecimal cant = leerBigDecimal(sc);
         if (cant.compareTo(BigDecimal.ZERO) <= 0) { System.err.println("ERROR: Cantidad debe ser mayor que 0"); return; }
 
-
         moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.DEPOSITO, cant), c);
 
         System.out.println("Depósito realizado correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: +%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());
     }
-
+    //Retirar dinero
     private static void retirar(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("--- RETIRAR DINERO ---");
         System.out.print("Introduzca el número de cuenta (IBAN): ");
@@ -222,13 +222,12 @@ public class Main {
             System.err.println("ERROR: Saldo insuficiente o cantidad inválida."); return;
         }
 
-
         moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.RETIRO, cant), c);
 
         System.out.println("Retirada realizada correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: -%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());
     }
-
+    //Transferencias entre cuentas
     private static void transferir(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("--- TRANSFERENCIAS ENTRE CUENTAS ---");
         System.out.print("IBAN ORIGEN: "); Cuenta ori = cuS.buscarCuenta(sc.nextLine());
@@ -241,14 +240,13 @@ public class Main {
         if (cant.compareTo(BigDecimal.ZERO) <= 0 || ori.getSaldo().compareTo(cant) < 0) {
             System.err.println("ERROR: Saldo insuficiente."); return;
         }
-
         moS.registrarMovimiento(crearM(ori.getId(), TipoMovimiento.TRANSFERENCIA_SALIENTE, cant), ori);
         moS.registrarMovimiento(crearM(des.getId(), TipoMovimiento.TRANSFERENCIA_ENTRANTE, cant), des);
 
         System.out.println("Transferencia realizada correctamente.");
         System.out.printf("Cuenta origen: %s → -%,.2f €%nCuenta destino: %s → +%,.2f €%n", ori.getNumeroCuenta(), cant, des.getNumeroCuenta(), cant);
     }
-
+    //Consultar saldo
     private static void consultarSaldo(Scanner sc, CuentaService cuS) {
         System.out.println("--- CONSULTAR SALDO ---");
         System.out.print("IBAN: ");
@@ -257,7 +255,7 @@ public class Main {
         System.out.println("Consulta de saldo exitosa.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Saldo disponible: %,.2f €%n", c.getSaldo());
     }
-
+    //Historial de movimientos
     private static void historial(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("---HISTORIAL DE MOVIMIENTOS---");
         System.out.print("IBAN: ");
@@ -275,7 +273,7 @@ public class Main {
             }
         }
     }
-
+    //Historial por fechas
     private static void historialPorFechas(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("--- MOVIMIENTOS POR RANGO DE FECHAS ---");
         System.out.print("IBAN: ");

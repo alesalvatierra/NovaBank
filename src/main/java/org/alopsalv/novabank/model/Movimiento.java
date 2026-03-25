@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Movimiento {
-
+    //Atributos
     private Long id, cuentaId;
     private TipoMovimiento tipo;
     private BigDecimal cantidad;

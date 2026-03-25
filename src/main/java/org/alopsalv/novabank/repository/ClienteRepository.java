@@ -24,7 +24,6 @@ public class ClienteRepository {
 
     //Método para bucar un cliente por id.
     public Cliente buscarPorId(Long id){
-
         return clientes.get(id);
     }
 
@@ -39,10 +38,8 @@ public class ClienteRepository {
         //Si no encuentra nada, devuelve null.
         return null;
     }
-
     //Método para almacenar en una lista los clientes registrados
     public List<Cliente> obtenerTodos(){
         return new ArrayList<>(clientes.values());
     }
-
 }
