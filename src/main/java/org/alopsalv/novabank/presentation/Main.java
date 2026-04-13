@@ -22,7 +22,7 @@ public class Main {
 
         ClienteService clienteService = new ClienteService(clienteRepo);
         CuentaService cuentaService = new CuentaService(cuentaRepo, clienteService);
-        MovimientoService movimientoService = new MovimientoService(movimientoRepo);
+        MovimientoService movimientoService = new MovimientoService(movimientoRepo, cuentaRepo);
 
         Scanner scanner = new Scanner(System.in);
         int opcionPrincipal = -1;
@@ -155,16 +155,24 @@ public class Main {
         System.out.print("Introduzca el ID del cliente titular: ");
         Long id = leerLong(sc);
         Cliente t = clS.buscarCliente(id);
-        if (t == null) { System.err.println("ERROR: No existe ningún cliente registrado con el ID " + id); return; }
+
+        if (t == null) {
+            System.err.println("ERROR: No existe ningún cliente registrado con el ID " + id);
+            return;
+        }
+
         Cuenta c = new Cuenta();
-        c.setClienteId(id); c.setSaldo(BigDecimal.ZERO); c.setFechaCreacion(LocalDateTime.now());
+        c.setClienteId(id);
+        c.setSaldo(BigDecimal.ZERO);
+        c.setFechaCreacion(LocalDateTime.now());
+
         try {
             Cuenta guardada = cuS.crearCuenta(c);
-            String iban = String.format("ES91210000%012d", guardada.getId());
-            guardada.setNumeroCuenta(iban);
-            System.out.println("Cuenta creada correctamente.\nNúmero de cuenta: " + iban);
+            System.out.println("Cuenta creada correctamente.\nNúmero de cuenta: " + guardada.getNumeroCuenta());
             System.out.println("Titular: " + t.getNombre() + " " + t.getApellidos() + " (ID: " + t.getId() + ")\nSaldo inicial: 0,00 €");
-        } catch (Exception ex) { System.err.println("ERROR: " + ex.getMessage()); }
+        } catch (Exception ex) {
+            System.err.println("ERROR: " + ex.getMessage());
+        }
     }
     //Listar todas las cuentas de 1 cliente
     private static void listarCuentasCliente(Scanner sc, ClienteService clS, CuentaService cuS) {
@@ -228,21 +236,23 @@ public class Main {
     //Transferencias entre cuentas
     private static void transferir(Scanner sc, CuentaService cuS, MovimientoService moS) {
         System.out.println("--- TRANSFERENCIAS ENTRE CUENTAS ---");
-        System.out.print("IBAN ORIGEN: "); Cuenta ori = cuS.buscarCuenta(sc.nextLine());
-        if (ori == null) { System.err.println("ERROR: Origen no encontrado."); return; }
-        System.out.print("IBAN DESTINO: "); Cuenta des = cuS.buscarCuenta(sc.nextLine());
-        if (des == null) { System.err.println("ERROR: Destino no encontrado."); return; }
-        if (ori.getId().equals(des.getId())) { System.err.println("ERROR: Misma cuenta."); return; }
+
+        System.out.print("IBAN ORIGEN: ");
+        String ibanOri = sc.nextLine();
+
+        System.out.print("IBAN DESTINO: ");
+        String ibanDes = sc.nextLine();
+
         System.out.print("Cantidad: ");
         BigDecimal cant = leerBigDecimal(sc);
-        if (cant.compareTo(BigDecimal.ZERO) <= 0 || ori.getSaldo().compareTo(cant) < 0) {
-            System.err.println("ERROR: Saldo insuficiente."); return;
-        }
-        moS.registrarMovimiento(crearM(ori.getId(), TipoMovimiento.TRANSFERENCIA_SALIENTE, cant), ori);
-        moS.registrarMovimiento(crearM(des.getId(), TipoMovimiento.TRANSFERENCIA_ENTRANTE, cant), des);
 
-        System.out.println("Transferencia realizada correctamente.");
-        System.out.printf("Cuenta origen: %s → -%,.2f €%nCuenta destino: %s → +%,.2f €%n", ori.getNumeroCuenta(), cant, des.getNumeroCuenta(), cant);
+        try {
+            moS.transferir(ibanOri, ibanDes, cant);
+            System.out.println("Transferencia realizada correctamente.");
+            System.out.printf("Cuenta origen: %s → -%,.2f €%nCuenta destino: %s → +%,.2f €%n", ibanOri, cant, ibanDes, cant);
+        } catch (Exception ex) {
+            System.err.println("ERROR: " + ex.getMessage());
+        }
     }
     //Consultar saldo
     private static void consultarSaldo(Scanner sc, CuentaService cuS) {
