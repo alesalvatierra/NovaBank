@@ -36,6 +36,6 @@ mvn test
 - `org.alopsalv.novabank.model`: Contiene las clases de dominio (Cliente, Cuenta, Movimiento) y el Enum TipoMovimiento.
 - `org.alopsalv.novabank.repository`: Simula el acceso a datos gestionando el almacenamiento temporal en memoria.
 - `org.alopsalv.novabank.service`: Contiene la lógica de negocio y las validaciones de las operaciones.
-- `org.alopsalv.novabank.Main`: Clase principal que arranca la aplicación y gestiona el menú por consola.
+- `org.alopsalv.novabank.presentation.Main`: Clase principal que arranca la aplicación y gestiona el menú por consola.
 
 **Enlace al repositorio de GitHub:** <https://github.com/alesalvatierra/NovaBank.git>
