@@ -1,9 +1,7 @@
 package org.alopsalv.novabank.presentation;
 
 import org.alopsalv.novabank.model.*;
-import org.alopsalv.novabank.repository.ClienteRepository;
-import org.alopsalv.novabank.repository.CuentaRepository;
-import org.alopsalv.novabank.repository.MovimientoRepository;
+import org.alopsalv.novabank.repository.*;
 import org.alopsalv.novabank.service.*;
 
 import java.math.BigDecimal;
@@ -18,9 +16,9 @@ public class Main {
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) {
-        ClienteRepository clienteRepo = new ClienteRepository();
-        CuentaRepository cuentaRepo = new CuentaRepository();
-        MovimientoRepository movimientoRepo = new MovimientoRepository();
+        ClienteRepository clienteRepo = new ClienteRepositoryJdbc();
+        CuentaRepository cuentaRepo = new CuentaRepositoryJdbc();
+        MovimientoRepository movimientoRepo = new MovimientoRepositoryJdbc();
 
         ClienteService clienteService = new ClienteService(clienteRepo);
         CuentaService cuentaService = new CuentaService(cuentaRepo, clienteService);

@@ -4,6 +4,7 @@ import org.alopsalv.novabank.model.Cliente;
 import org.alopsalv.novabank.repository.ClienteRepository;
 
 import java.util.List;
+import java.util.Optional; // Importante añadir esto
 
 public class ClienteService {
 
@@ -43,26 +44,31 @@ public class ClienteService {
             throw new IllegalArgumentException("Formato de teléfono inválido. Debe tener 9 dígitos (puede incluir +34).");
         }
 
-        //Validamos los campos únicos
-        List<Cliente> todos = clienteRepository.obtenerTodos();
+        List<Cliente> todos = clienteRepository.listarTodos();
         for (Cliente existente : todos) {
             if (existente.getDni().equalsIgnoreCase(c.getDni())) throw new IllegalArgumentException("Ya existe un cliente con el DNI: " + c.getDni());
             if (existente.getEmail().equalsIgnoreCase(c.getEmail())) throw new IllegalArgumentException("Ya existe un cliente con el email: " + c.getEmail());
             if (existente.getTelefono().equals(c.getTelefono())) throw new IllegalArgumentException("Ya existe un cliente con el teléfono: " + c.getTelefono());
         }
 
-        return clienteRepository.guardarCliente(c);
+        return clienteRepository.guardar(c);
     }
+
     //Buscar Cliente
     public Cliente buscarCliente(Long id) {
-        return clienteRepository.buscarPorId(id);
+        // CAMBIO 3: Desempaquetamos el Optional con orElse(null)
+        return clienteRepository.buscarPorId(id).orElse(null);
     }
+
     //Buscar Cliente por DNI
     public Cliente buscarClientePorDni(String dni) {
-        return clienteRepository.buscarPorDni(dni);
+        // CAMBIO 4: Desempaquetamos el Optional con orElse(null)
+        return clienteRepository.buscarPorDni(dni).orElse(null);
     }
+
     //Obtener todos los Clientes
     public List<Cliente> obtenerTodosLosClientes() {
-        return clienteRepository.obtenerTodos();
+        // CAMBIO 5: Usamos listarTodos()
+        return clienteRepository.listarTodos();
     }
 }
