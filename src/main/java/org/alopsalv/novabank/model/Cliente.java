@@ -18,6 +18,10 @@ public class Cliente {
         this.telefono = telefono;
     }
 
+    public Cliente() {
+
+    }
+
     //Getters y Setters
     public Long getId() {
         return id;
