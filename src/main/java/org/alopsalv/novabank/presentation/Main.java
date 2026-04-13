@@ -1,4 +1,4 @@
-package org.alopsalv.novabank;
+package org.alopsalv.novabank.presentation;
 
 import org.alopsalv.novabank.model.*;
 import org.alopsalv.novabank.repository.ClienteRepository;

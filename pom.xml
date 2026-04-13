@@ -52,7 +52,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>org.alopsalv.novabank.Main</mainClass>
+                    <mainClass>org.alopsalv.novabank.presentation.Main</mainClass>
                 </configuration>
             </plugin>
             <!-- Ejecutar tests -->
@@ -69,7 +69,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.alopsalv.novabank.Main</mainClass>
+                            <mainClass>org.alopsalv.novabank.presentation.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
