@@ -13,19 +13,30 @@ public class CuentaRepositoryJdbc implements CuentaRepository {
 
     @Override
     public Cuenta guardar(Cuenta cuenta) {
-        String sql = "INSERT INTO cuentas (numero_cuenta, cliente_id, saldo) VALUES (?, ?, ?) RETURNING id, fecha_creacion";
-        try (Connection conn = DatabaseConnectionManager.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sqlSecuencia = "SELECT COALESCE(MAX(id), 0) + 1 AS proximo_id FROM cuentas";
 
-            stmt.setString(1, cuenta.getNumeroCuenta());
-            stmt.setLong(2, cuenta.getClienteId());
-            stmt.setBigDecimal(3, cuenta.getSaldo());
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                cuenta.setId(rs.getLong("id"));
+        try (Connection conn = DatabaseConnectionManager.getConnection()) {
+            try (Statement stmtSeq = conn.createStatement();
+                 ResultSet rsSeq = stmtSeq.executeQuery(sqlSecuencia)) {
+                if (rsSeq.next()) {
+                    long proximoId = rsSeq.getLong("proximo_id");
+                    cuenta.setNumeroCuenta(String.format("ES91210000%012d", proximoId));
+                }
             }
-            return cuenta;
+
+            //Insertamos la cuenta con su IBAN ya fabricado
+            String sql = "INSERT INTO cuentas (numero_cuenta, cliente_id, saldo) VALUES (?, ?, ?) RETURNING id, fecha_creacion";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, cuenta.getNumeroCuenta());
+                stmt.setLong(2, cuenta.getClienteId());
+                stmt.setBigDecimal(3, cuenta.getSaldo());
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    cuenta.setId(rs.getLong("id"));
+                }
+                return cuenta;
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error al guardar la cuenta", e);
         }
