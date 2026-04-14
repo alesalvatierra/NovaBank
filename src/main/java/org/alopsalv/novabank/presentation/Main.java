@@ -113,11 +113,22 @@ public class Main {
         System.out.print("Introduzca el DNI/NIF: "); String d = sc.nextLine();
         System.out.print("Introduzca el email: "); String e = sc.nextLine();
         System.out.print("Introduzca el teléfono: "); String t = sc.nextLine();
+
         try {
-            Cliente nuevo = service.crearCliente(new Cliente(n, a, d, e, t));
+            //BUILDER
+            Cliente clienteConstruido = new ClienteBuilder()
+                    .nombre(n)
+                    .apellidos(a)
+                    .dni(d)
+                    .email(e)
+                    .telefono(t)
+                    .build();
+            Cliente nuevo = service.crearCliente(clienteConstruido);
             System.out.println("Cliente creado correctamente.");
             System.out.println("ID cliente: " + nuevo.getId());
-        } catch (IllegalArgumentException ex) { System.err.println("ERROR: " + ex.getMessage()); }
+        } catch (IllegalArgumentException ex) {
+            System.err.println("ERROR: " + ex.getMessage());
+        }
     }
     //Buscar Cliente
     private static void buscarCliente(Scanner sc, ClienteService service) {
@@ -211,7 +222,7 @@ public class Main {
         BigDecimal cant = leerBigDecimal(sc);
         if (cant.compareTo(BigDecimal.ZERO) <= 0) { System.err.println("ERROR: Cantidad debe ser mayor que 0"); return; }
 
-        moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.DEPOSITO, cant), c);
+        moS.registrarMovimiento(MovimientoFactory.crearDeposito(c.getId(), cant), c);
 
         System.out.println("Depósito realizado correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: +%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());
@@ -228,7 +239,7 @@ public class Main {
             System.err.println("ERROR: Saldo insuficiente o cantidad inválida."); return;
         }
 
-        moS.registrarMovimiento(crearM(c.getId(), TipoMovimiento.RETIRO, cant), c);
+        moS.registrarMovimiento(MovimientoFactory.crearRetiro(c.getId(), cant), c);
 
         System.out.println("Retirada realizada correctamente.\nCuenta: " + c.getNumeroCuenta());
         System.out.printf("Importe: -%,.2f €%nNuevo saldo: %,.2f €%n", cant, c.getSaldo());

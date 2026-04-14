@@ -3,6 +3,7 @@ package org.alopsalv.novabank.service;
 import org.alopsalv.novabank.config.DatabaseConnectionManager;
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.model.Movimiento;
+import org.alopsalv.novabank.model.MovimientoFactory;
 import org.alopsalv.novabank.model.TipoMovimiento;
 import org.alopsalv.novabank.repository.CuentaRepository;
 import org.alopsalv.novabank.repository.MovimientoRepository;
@@ -84,14 +85,18 @@ public class MovimientoService {
         }
     }
 
-    //Método auxiliar para no repetir código en la transacción
+    // Método auxiliar para no repetir código en la transacción
     private void registrarMovimientoTransaccional(Long cuentaId, TipoMovimiento tipo, BigDecimal cant, Connection conn) {
-        Movimiento m = new Movimiento();
-        m.setCuentaId(cuentaId);
-        m.setTipo(tipo);
-        m.setCantidad(cant);
-        m.setFecha(LocalDateTime.now());
-        movimientoRepository.guardar(m, conn);
+        Movimiento m = null;
+        if (tipo == TipoMovimiento.TRANSFERENCIA_SALIENTE) {
+            m = MovimientoFactory.crearTransferenciaSaliente(cuentaId, cant);
+        } else if (tipo == TipoMovimiento.TRANSFERENCIA_ENTRANTE) {
+            m = MovimientoFactory.crearTransferenciaEntrante(cuentaId, cant);
+        }
+
+        if (m != null) {
+            movimientoRepository.guardar(m, conn);
+        }
     }
 
     public List<Movimiento> obtenerMovimientosDeCuenta(Long id) { return movimientoRepository.buscarPorCuentaId(id); }
