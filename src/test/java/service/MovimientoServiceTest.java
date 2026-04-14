@@ -1,28 +1,45 @@
+package service;
+
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.model.Movimiento;
 import org.alopsalv.novabank.model.TipoMovimiento;
+import org.alopsalv.novabank.repository.CuentaRepository;
 import org.alopsalv.novabank.repository.MovimientoRepository;
 import org.alopsalv.novabank.service.MovimientoService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class MovimientoServiceTest {
 
-    private MovimientoService movimientoService;
+    @Mock
     private MovimientoRepository movimientoRepository;
+
+    @Mock
+    private CuentaRepository cuentaRepository;
+
+    @InjectMocks
+    private MovimientoService movimientoService;
+
     private Cuenta cuentaPrueba;
 
     @BeforeEach
     void setUp() {
-        movimientoRepository = new MovimientoRepository();
-        movimientoService = new MovimientoService(movimientoRepository);
-
         //Preparamos una cuenta con 1000€ de saldo inicial para tests
         cuentaPrueba = new Cuenta();
         cuentaPrueba.setId(1L);
@@ -43,6 +60,10 @@ class MovimientoServiceTest {
 
         //El saldo esperado es 1500
         assertEquals(new BigDecimal("1500.00"), cuentaPrueba.getSaldo());
+
+        //Comprobamos que el servicio le pidió al repositorio actualizar la BD
+        verify(cuentaRepository).actualizarSaldo(1L, new BigDecimal("1500.00"));
+        verify(movimientoRepository).guardar(deposito);
     }
 
     @Test
@@ -56,8 +77,12 @@ class MovimientoServiceTest {
 
         movimientoService.registrarMovimiento(retiro, cuentaPrueba);
 
-        // El saldo era 1000, restamos 200, tiene que quedar en 800
+        //El saldo era 1000, restamos 200, tiene que quedar en 800
         assertEquals(new BigDecimal("800.00"), cuentaPrueba.getSaldo());
+
+        //Comprobamos que el servicio le pidió al repositorio actualizar la BD
+        verify(cuentaRepository).actualizarSaldo(1L, new BigDecimal("800.00"));
+        verify(movimientoRepository).guardar(retiro);
     }
 
     @Test
@@ -72,8 +97,13 @@ class MovimientoServiceTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             movimientoService.registrarMovimiento(movimientoMalo, cuentaPrueba);
         });
+
         //Mensaje de error que se espera
         assertTrue(exception.getMessage().contains("mayor que cero"));
+
+        //Como dio error, comprobamos que NO se tocó la BD para nada
+        verifyNoInteractions(cuentaRepository);
+        verifyNoInteractions(movimientoRepository);
     }
 
     @Test
@@ -88,10 +118,38 @@ class MovimientoServiceTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             movimientoService.registrarMovimiento(retiroMasivo, cuentaPrueba);
         });
+
         //Mensaje de error esperado
         assertTrue(exception.getMessage().contains("Saldo insuficiente"));
 
         //Comprobamos que el saldo no se ha modificado al saltar el error y sigue siendo 1000
         assertEquals(new BigDecimal("1000.00"), cuentaPrueba.getSaldo());
+
+        //Como dio error, comprobamos que NO se guardó nada en la BD
+        verifyNoInteractions(cuentaRepository);
+        verifyNoInteractions(movimientoRepository);
+    }
+
+    @Test
+    @DisplayName("Debería lanzar error al hacer TRANSFERENCIA sin saldo suficiente")
+    void transferir_conSaldoInsuficiente_debeLanzarExcepcion() {
+        //Configuramos el Mock para que cuando el servicio busque la cuenta origen, devuelva nuestra cuentaPrueba (1000€)
+        when(cuentaRepository.buscarPorNumero(eq("ES91210000000000000001"), any()))
+                .thenReturn(Optional.of(cuentaPrueba));
+
+        //Configuramos el Mock para la cuenta de destino
+        when(cuentaRepository.buscarPorNumero(eq("ES00000000000000000002"), any()))
+                .thenReturn(Optional.of(new Cuenta()));
+
+        //Intentamos transferir 5000€
+        Exception exception = assertThrows(IllegalArgumentException.class, () ->
+                movimientoService.transferir("ES91210000000000000001", "ES00000000000000000002", new BigDecimal("5000.00"))
+        );
+
+        assertTrue(exception.getMessage().contains("Saldo insuficiente"));
+
+        //Verificamos que la transacción se cortó y NO se guardó ningún cambio de saldo ni movimiento
+        verify(cuentaRepository, never()).actualizarSaldo(anyLong(), any(), any());
+        verify(movimientoRepository, never()).guardar(any(), any());
     }
 }
