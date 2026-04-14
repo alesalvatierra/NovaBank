@@ -135,6 +135,11 @@ public class CuentaRepositoryJdbc implements CuentaRepository {
         c.setNumeroCuenta(rs.getString("numero_cuenta"));
         c.setClienteId(rs.getLong("cliente_id"));
         c.setSaldo(rs.getBigDecimal("saldo"));
+
+        if (rs.getTimestamp("fecha_creacion") != null) {
+            c.setFechaCreacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
+        }
+
         return c;
     }
 }
