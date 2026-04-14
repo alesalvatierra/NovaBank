@@ -12,7 +12,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
 
     @Override
     public Cliente guardar(Cliente cliente) {
-        // Usamos RETURNING id para que PostgreSQL nos devuelva el ID autogenerado
+        //Usamos RETURNING id para que nos devuelva el ID autogenerado
         String sql = "INSERT INTO clientes (nombre, apellidos, dni, email, telefono) VALUES (?, ?, ?, ?, ?) RETURNING id, fecha_creacion";
 
         try (Connection conn = DatabaseConnectionManager.getConnection();
@@ -27,8 +27,6 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 cliente.setId(rs.getLong("id"));
-                // Si tienes fechaCreacion en tu modelo Cliente, puedes setearla aquí también
-                // cliente.setFechaCreacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
             }
             return cliente;
 
@@ -108,7 +106,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         }
     }
 
-    // Método auxiliar (Mapeo de ResultSet a Objeto Java)
+    //Método auxiliar (Mapeo de ResultSet a Objeto)
     private Cliente mapearCliente(ResultSet rs) throws SQLException {
         Cliente c = new Cliente();
         c.setId(rs.getLong("id"));
@@ -117,8 +115,6 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         c.setDni(rs.getString("dni"));
         c.setEmail(rs.getString("email"));
         c.setTelefono(rs.getString("telefono"));
-        // Si tienes la fecha, descomenta esto:
-        // c.setFechaCreacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
         return c;
     }
 }

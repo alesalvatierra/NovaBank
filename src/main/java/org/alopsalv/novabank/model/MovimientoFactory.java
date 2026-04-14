@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class MovimientoFactory {
 
+    //Método crearDeposito
     public static Movimiento crearDeposito(Long cuentaId, BigDecimal monto) {
         Movimiento m = new Movimiento();
         m.setCuentaId(cuentaId);
@@ -13,7 +14,7 @@ public class MovimientoFactory {
         m.setFecha(LocalDateTime.now());
         return m;
     }
-
+    //Método crearRetiro
     public static Movimiento crearRetiro(Long cuentaId, BigDecimal monto) {
         Movimiento m = new Movimiento();
         m.setCuentaId(cuentaId);
@@ -22,7 +23,7 @@ public class MovimientoFactory {
         m.setFecha(LocalDateTime.now());
         return m;
     }
-
+    //Método crearTransferenciaSaliente
     public static Movimiento crearTransferenciaSaliente(Long cuentaId, BigDecimal monto) {
         Movimiento m = new Movimiento();
         m.setCuentaId(cuentaId);
@@ -31,7 +32,7 @@ public class MovimientoFactory {
         m.setFecha(LocalDateTime.now());
         return m;
     }
-
+    //Método crearTransferenciaEntrante
     public static Movimiento crearTransferenciaEntrante(Long cuentaId, BigDecimal monto) {
         Movimiento m = new Movimiento();
         m.setCuentaId(cuentaId);

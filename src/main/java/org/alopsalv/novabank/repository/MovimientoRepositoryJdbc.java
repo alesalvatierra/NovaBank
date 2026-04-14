@@ -79,7 +79,7 @@ public class MovimientoRepositoryJdbc implements MovimientoRepository {
             throw new RuntimeException("Error al buscar movimientos por fechas", e);
         }
     }
-
+    //Método para mapearMovimiento
     private Movimiento mapearMovimiento(ResultSet rs) throws SQLException {
         Movimiento m = new Movimiento();
         m.setId(rs.getLong("id"));

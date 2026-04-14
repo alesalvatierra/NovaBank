@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.List;
 
+//Interfaz MovimientoRepository
 public interface MovimientoRepository {
     Movimiento guardar(Movimiento movimiento);
     List<Movimiento> buscarPorCuentaId(Long cuentaId);

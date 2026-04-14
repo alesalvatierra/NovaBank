@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
+//Interfaz CuentaRepository
 public interface CuentaRepository {
     Cuenta guardar(Cuenta cuenta);
     Optional<Cuenta> buscarPorId(Long id);
