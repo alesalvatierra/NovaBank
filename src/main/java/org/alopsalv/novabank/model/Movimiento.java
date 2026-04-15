@@ -2,7 +2,10 @@ package org.alopsalv.novabank.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+/*
+    Clase para registrar cada transacción financiera
+    Mantiene la trazabilidad de los fondos y la fecha de cada operación
+ */
 public class Movimiento {
     //Atributos
     private Long id, cuentaId;

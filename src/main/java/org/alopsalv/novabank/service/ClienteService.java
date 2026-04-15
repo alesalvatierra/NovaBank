@@ -5,7 +5,10 @@ import org.alopsalv.novabank.repository.ClienteRepository;
 
 import java.util.List;
 import java.util.Optional; // Importante añadir esto
-
+/*
+    Clase para la capa de lógica de negocio para la gestión de clientes
+    Aplica validaciones de formato y control de duplicados
+ */
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;

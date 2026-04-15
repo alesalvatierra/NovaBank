@@ -7,6 +7,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/*
+    Clase para gestionar la conexión con la bd PostgreSQL.
+    Se implementa el patrón Singleton para asegurar que solo exista una instancia del gestor.
+    Carga las credenciales desde un archivo de propiedades para mayor seguridad.
+ */
 public class DatabaseConnectionManager {
     private static DatabaseConnectionManager instance;
     private static final Properties properties = new Properties();

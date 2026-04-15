@@ -5,7 +5,10 @@ import org.alopsalv.novabank.repository.CuentaRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-
+/*
+    Clase para el servicio encargado de la gestión de productos bancarios.
+    Valida la existencia del titular antes de la apertura de nuevas cuentas.
+ */
 public class CuentaService {
 
     private final CuentaRepository cuentaRepository;

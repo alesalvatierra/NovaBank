@@ -2,7 +2,10 @@ package org.alopsalv.novabank.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+/*
+    Clase que implementa el patrón de diseño Factory para centralizar la creación de movimientos
+    Clasifica y construye objetos Movimiento según su tipo de forma estandarizada
+ */
 public class MovimientoFactory {
 
     //Método crearDeposito

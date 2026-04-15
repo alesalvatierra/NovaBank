@@ -16,7 +16,10 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/*
+    Clase para coordinar las operaciones financieras del banco.
+    Implementa la lógica de transferencias atómicas y filtrado de datos mediante Streams.
+ */
 public class MovimientoService {
 
     private final MovimientoRepository movimientoRepository;

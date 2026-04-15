@@ -2,7 +2,9 @@ package org.alopsalv.novabank.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+/*
+    Clase que representa una cuenta bancaria
+ */
 public class Cuenta {
     //Atributos
     private Long id, clienteId;

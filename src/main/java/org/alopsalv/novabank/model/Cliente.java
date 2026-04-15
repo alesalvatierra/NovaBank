@@ -2,6 +2,9 @@ package org.alopsalv.novabank.model;
 
 import java.time.LocalDateTime;
 
+/*
+    Clase que representa la entidad Cliente
+ */
 public class Cliente {
     //Atributos clase Cliente
     private Long id;

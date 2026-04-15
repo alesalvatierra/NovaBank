@@ -106,7 +106,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         }
     }
 
-    //Método auxiliar (Mapeo de ResultSet a Objeto)
+    //Método auxiliar para Mapeo de ResultSet a Objeto
     private Cliente mapearCliente(ResultSet rs) throws SQLException {
         Cliente c = new Cliente();
         c.setId(rs.getLong("id"));

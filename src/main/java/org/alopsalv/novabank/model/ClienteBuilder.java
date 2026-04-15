@@ -1,5 +1,9 @@
 package org.alopsalv.novabank.model;
 
+/*
+    Clase que implementa el patrón de diseño Builder para la clase Cliente.
+    Permite la creación de objetos Cliente de forma fluida y legible, facilitando el desarrollo de tests.
+ */
 public class ClienteBuilder {
     private String nombre;
     private String apellidos;
