@@ -1,11 +1,17 @@
 package org.alopsalv.novabank.service;
 
+import org.alopsalv.novabank.dto.ClienteDTO;
+import org.alopsalv.novabank.dto.ClienteMapper;
 import org.alopsalv.novabank.model.Cliente;
 import org.alopsalv.novabank.repository.ClienteRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional; // Importante añadir esto
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
@@ -14,61 +20,39 @@ public class ClienteService {
         this.clienteRepository = clienteRepository;
     }
 
-    public Cliente crearCliente(Cliente c) {
-        //Validamos que no haya Null ni en Blanco
-        if (c.getNombre() == null || c.getNombre().trim().isEmpty()) throw new IllegalArgumentException("El nombre es obligatorio.");
-        if (c.getApellidos() == null || c.getApellidos().trim().isEmpty()) throw new IllegalArgumentException("Los apellidos son obligatorios.");
-        if (c.getDni() == null || c.getDni().trim().isEmpty()) throw new IllegalArgumentException("El DNI es obligatorio.");
-        if (c.getEmail() == null || c.getEmail().trim().isEmpty()) throw new IllegalArgumentException("El email es obligatorio.");
-        if (c.getTelefono() == null || c.getTelefono().trim().isEmpty()) throw new IllegalArgumentException("El teléfono es obligatorio.");
+    /**
+     * Registra un nuevo cliente validando que el DNI y el Email no existan previamente.
+     */
+    public ClienteDTO registrarCliente(ClienteDTO clienteDTO) {
 
-        //Validamos las longitudes según las tablas
-        if (c.getNombre().length() > 100) throw new IllegalArgumentException("El nombre no puede exceder 100 caracteres.");
-        if (c.getApellidos().length() > 150) throw new IllegalArgumentException("Los apellidos no pueden exceder 150 caracteres.");
-        if (c.getDni().length() > 20) throw new IllegalArgumentException("El DNI no puede exceder 20 caracteres.");
-        if (c.getEmail().length() > 150) throw new IllegalArgumentException("El email no puede exceder 150 caracteres.");
-        if (c.getTelefono().length() > 20) throw new IllegalArgumentException("El teléfono no puede exceder 20 caracteres.");
-
-        //Validamos formato DNI
-        if (!c.getDni().matches("^[0-9]{8}[a-zA-Z]$")) {
-            throw new IllegalArgumentException("Formato de DNI inválido. Debe tener 8 números y 1 letra.");
+        if (clienteRepository.existsByDni(clienteDTO.getDni())) {
+            throw new RuntimeException("Ya existe un cliente con este DNI");
+        }
+        if (clienteRepository.existsByEmail(clienteDTO.getEmail())) {
+            throw new RuntimeException("Ya existe un cliente con este Email");
         }
 
-        //Validamos formato Email
-        if (!c.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            throw new IllegalArgumentException("El formato del email no es válido.");
-        }
+        //Convertimos el DTO que entra a Entidad para la BD
+        Cliente cliente = ClienteMapper.toEntity(clienteDTO);
 
-        //Validamos formato de Teléfono
-        if (!c.getTelefono().matches("^(\\+34)?[0-9]{9}$")) {
-            throw new IllegalArgumentException("Formato de teléfono inválido. Debe tener 9 dígitos (puede incluir +34).");
-        }
+        //Guardamos en BD
+        Cliente clienteGuardado = clienteRepository.save(cliente);
 
-        List<Cliente> todos = clienteRepository.listarTodos();
-        for (Cliente existente : todos) {
-            if (existente.getDni().equalsIgnoreCase(c.getDni())) throw new IllegalArgumentException("Ya existe un cliente con el DNI: " + c.getDni());
-            if (existente.getEmail().equalsIgnoreCase(c.getEmail())) throw new IllegalArgumentException("Ya existe un cliente con el email: " + c.getEmail());
-            if (existente.getTelefono().equals(c.getTelefono())) throw new IllegalArgumentException("Ya existe un cliente con el teléfono: " + c.getTelefono());
-        }
-
-        return clienteRepository.guardar(c);
+        //Devolvemos el resultado convertido de nuevo a DTO
+        return ClienteMapper.toDTO(clienteGuardado);
     }
 
-    //Buscar Cliente
-    public Cliente buscarCliente(Long id) {
-        // CAMBIO 3: Desempaquetamos el Optional con orElse(null)
-        return clienteRepository.buscarPorId(id).orElse(null);
+    @Transactional(readOnly = true)
+    public ClienteDTO obtenerCliente(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+        return ClienteMapper.toDTO(cliente);
     }
 
-    //Buscar Cliente por DNI
-    public Cliente buscarClientePorDni(String dni) {
-        // CAMBIO 4: Desempaquetamos el Optional con orElse(null)
-        return clienteRepository.buscarPorDni(dni).orElse(null);
-    }
-
-    //Obtener todos los Clientes
-    public List<Cliente> obtenerTodosLosClientes() {
-        // CAMBIO 5: Usamos listarTodos()
-        return clienteRepository.listarTodos();
+    @Transactional(readOnly = true)
+    public List<ClienteDTO> listarClientes() {
+        return clienteRepository.findAll().stream()
+                .map(ClienteMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
