@@ -1,44 +1,44 @@
 package org.alopsalv.novabank.service;
 
+import org.alopsalv.novabank.dto.CuentaDTO;
+import org.alopsalv.novabank.dto.CuentaMapper;
+import org.alopsalv.novabank.dto.OperacionDTO;
 import org.alopsalv.novabank.model.Cuenta;
+import org.alopsalv.novabank.model.Movimiento;
+import org.alopsalv.novabank.model.TipoMovimiento;
 import org.alopsalv.novabank.repository.CuentaRepository;
+import org.alopsalv.novabank.repository.MovimientoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
+@Service
+@Transactional
 public class CuentaService {
 
     private final CuentaRepository cuentaRepository;
-    private final ClienteService clienteService;
+    // Añadimos el repositorio de movimientos
+    private final MovimientoRepository movimientoRepository;
 
-    public CuentaService(CuentaRepository cuentaRepository, ClienteService clienteService) {
+    // Actualizamos el constructor para inyectar ambos repositorios
+    public CuentaService(CuentaRepository cuentaRepository, MovimientoRepository movimientoRepository) {
         this.cuentaRepository = cuentaRepository;
-        this.clienteService = clienteService;
+        this.movimientoRepository = movimientoRepository;
     }
 
-    //Método para crear una cuenta validando que esta existe.
-    public Cuenta crearCuenta(Cuenta cuentaNueva){
-
-        if (cuentaNueva.getSaldo().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("El saldo inicial no puede ser negativo.");
-        }
-
-        //Validamos que el cliente exista
-        var clienteExistente = clienteService.buscarCliente(cuentaNueva.getClienteId());
-        if (clienteExistente == null){
-            throw new IllegalArgumentException("ERROR: No se encontró ningún cliente con ese ID.");
-        }
-
-        return cuentaRepository.guardar(cuentaNueva);
+    @Transactional(readOnly = true)
+    public List<Cuenta> listarCuentas() {
+        return cuentaRepository.findAll();
     }
 
-    //Método para buscarCuenta por IBAN.
-    public Cuenta buscarCuenta(String numeroCuenta){
-        return cuentaRepository.buscarPorNumero(numeroCuenta).orElse(null);
+    @Transactional(readOnly = true)
+    public Cuenta obtenerCuenta(Long id) {
+        return cuentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada con ID: " + id));
     }
 
-    //Método para obtener todas las cuentas del mismo cliente.
-    public List<Cuenta> obtenerCuentasDeCliente(Long clienteId){
-        return cuentaRepository.buscarPorClienteId(clienteId);
+    public Cuenta crearCuenta(Cuenta cuenta) {
+        return cuentaRepository.save(cuenta);
     }
 }

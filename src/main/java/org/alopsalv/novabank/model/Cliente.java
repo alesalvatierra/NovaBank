@@ -1,14 +1,47 @@
 package org.alopsalv.novabank.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Clase que representa la entidad Cliente mapeada a la base de datos.
+ */
+@Entity
+@Table(name = "clientes")
 public class Cliente {
-    //Atributos clase Cliente
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre, apellidos, dni, email, telefono;
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Column(nullable = false)
+    private String apellidos;
+
+    @Column(nullable = false, unique = true)
+    private String dni;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true)
+    private String telefono;
+
+    @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
 
-    //Constructor
+    /**
+     * Relación uno a muchos con Cuenta
+     */
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Cuenta> cuentas = new ArrayList<>();
+
+    public Cliente() {
+    }
 
     public Cliente(String nombre, String apellidos, String dni, String email, String telefono) {
         this.nombre = nombre;
@@ -18,11 +51,15 @@ public class Cliente {
         this.telefono = telefono;
     }
 
-    public Cliente() {
-
+    /**
+     * Método de ciclo de vida para asignar la fecha antes de persistir.
+     */
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
     }
 
-    //Getters y Setters
+    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -79,7 +116,14 @@ public class Cliente {
         this.fechaCreacion = fechaCreacion;
     }
 
-    //Método toString
+    public List<Cuenta> getCuentas() {
+        return cuentas;
+    }
+
+    public void setCuentas(List<Cuenta> cuentas) {
+        this.cuentas = cuentas;
+    }
+
     @Override
     public String toString() {
         return "Cliente{" +
