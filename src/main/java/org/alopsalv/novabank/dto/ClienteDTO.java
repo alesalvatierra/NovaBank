@@ -1,19 +1,34 @@
 package org.alopsalv.novabank.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 /**
  * Objeto de Transferencia de Datos para Cliente.
- * Aísla el modelo de dominio de la API pública.
  */
 public class ClienteDTO {
+
     private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+
+    @NotBlank(message = "Los apellidos son obligatorios")
     private String apellidos;
+
+    @NotBlank(message = "El DNI es obligatorio")
     private String dni;
+
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El formato del email no es válido")
     private String email;
+
+    @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
+
     private LocalDateTime fechaCreacion;
+
     private int numeroCuentas;
 
     public ClienteDTO() {}

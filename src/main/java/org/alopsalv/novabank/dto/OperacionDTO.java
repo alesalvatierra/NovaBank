@@ -1,12 +1,16 @@
 package org.alopsalv.novabank.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+/**
+ * DTO para capturar los datos de una operación
+ */
 public class OperacionDTO {
 
-    @NotNull(message = "El número de cuenta es obligatorio")
+    @NotBlank(message = "El número de cuenta es obligatorio")
     private String numeroCuenta;
 
     @NotNull(message = "El importe es obligatorio")
