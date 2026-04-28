@@ -2,6 +2,7 @@ package org.alopsalv.novabank.service;
 
 import org.alopsalv.novabank.dto.ClienteDTO;
 import org.alopsalv.novabank.dto.ClienteMapper;
+import org.alopsalv.novabank.exception.ClienteNotFoundException;
 import org.alopsalv.novabank.model.Cliente;
 import org.alopsalv.novabank.repository.ClienteRepository;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,10 @@ public class ClienteService {
     public ClienteDTO registrarCliente(ClienteDTO clienteDTO) {
 
         if (clienteRepository.existsByDni(clienteDTO.getDni())) {
-            throw new RuntimeException("Ya existe un cliente con este DNI");
+            throw new ClienteNotFoundException("Ya existe un cliente con este DNI");
         }
         if (clienteRepository.existsByEmail(clienteDTO.getEmail())) {
-            throw new RuntimeException("Ya existe un cliente con este Email");
+            throw new ClienteNotFoundException("Ya existe un cliente con este Email");
         }
 
         //Convertimos el DTO que entra a Entidad para la BD
@@ -45,7 +46,7 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public ClienteDTO obtenerCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+                .orElseThrow(() -> new org.alopsalv.novabank.exception.ClienteNotFoundException("Cliente no encontrado con ID: " + id));
         return ClienteMapper.toDTO(cliente);
     }
 

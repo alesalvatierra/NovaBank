@@ -3,6 +3,7 @@ package org.alopsalv.novabank.service;
 import org.alopsalv.novabank.dto.CuentaDTO;
 import org.alopsalv.novabank.dto.CuentaMapper;
 import org.alopsalv.novabank.dto.OperacionDTO;
+import org.alopsalv.novabank.exception.ClienteNotFoundException;
 import org.alopsalv.novabank.model.Cuenta;
 import org.alopsalv.novabank.model.Movimiento;
 import org.alopsalv.novabank.model.TipoMovimiento;
@@ -25,7 +26,7 @@ public class OperacionService {
 
     public CuentaDTO realizarOperacion(OperacionDTO operacionDTO, TipoMovimiento tipo) {
         Cuenta cuenta = cuentaRepository.findByNumeroCuenta(operacionDTO.getNumeroCuenta())
-                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada: " + operacionDTO.getNumeroCuenta()));
+                .orElseThrow(() -> new ClienteNotFoundException("Cuenta no encontrada: " + operacionDTO.getNumeroCuenta()));
 
         if (tipo == TipoMovimiento.RETIRO && cuenta.getSaldo().compareTo(operacionDTO.getImporte()) < 0) {
             throw new org.alopsalv.novabank.exception.SaldoInsuficienteException("Saldo insuficiente para realizar el retiro");
