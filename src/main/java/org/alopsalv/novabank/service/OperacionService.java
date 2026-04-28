@@ -28,7 +28,7 @@ public class OperacionService {
                 .orElseThrow(() -> new RuntimeException("Cuenta no encontrada: " + operacionDTO.getNumeroCuenta()));
 
         if (tipo == TipoMovimiento.RETIRO && cuenta.getSaldo().compareTo(operacionDTO.getImporte()) < 0) {
-            throw new RuntimeException("Saldo insuficiente para realizar el retiro");
+            throw new org.alopsalv.novabank.exception.SaldoInsuficienteException("Saldo insuficiente para realizar el retiro");
         }
 
         if (tipo == TipoMovimiento.DEPOSITO) {
@@ -40,6 +40,7 @@ public class OperacionService {
         Movimiento movimiento = new Movimiento(cuenta, tipo, operacionDTO.getImporte());
         movimientoRepository.save(movimiento);
 
-        return CuentaMapper.toDTO(cuentaRepository.save(cuenta));
+        return org.alopsalv.novabank.dto.CuentaMapper.toDTO(cuentaRepository.save(cuenta));
     }
+
 }
