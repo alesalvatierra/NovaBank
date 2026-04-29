@@ -20,7 +20,7 @@ public class MovimientoService {
     }
 
     /**
-     * Obtiene el historial de una cuenta y lo devuelve como una lista de DTOs.
+     * Obtiene el historial de una cuenta.
      */
     @Transactional(readOnly = true)
     public List<MovimientoDTO> obtenerHistorialPorCuenta(Long cuentaId) {

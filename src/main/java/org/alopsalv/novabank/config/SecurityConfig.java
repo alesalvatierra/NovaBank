@@ -1,5 +1,6 @@
-package org.alopsalv.novabank.security;
+package org.alopsalv.novabank.config;
 
+import org.alopsalv.novabank.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
